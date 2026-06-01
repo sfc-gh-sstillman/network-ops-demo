@@ -1,0 +1,25 @@
+spec:
+  containers:
+    - name: app
+      image: sfcogsops-snowhouse-aws-us-west-2.registry.snowflakecomputing.com/temp/network_ops_staging/images/network-ops-app:v1
+      env:
+        SNOWFLAKE_ACCOUNT: snowhouse
+        SNOWFLAKE_WAREHOUSE: APP_THOUGHTSPOT_OAUTH_WH
+        SNOWFLAKE_DATABASE: TEMP
+        SNOWFLAKE_SCHEMA: NETWORK_OPS_ANALYTICS
+        ENVIRONMENT: spcs
+        PORT: "8080"
+      readinessProbe:
+        port: 8080
+        path: /health
+      resources:
+        requests:
+          memory: 1G
+          cpu: 0.5
+        limits:
+          memory: 2G
+          cpu: 1
+  endpoints:
+    - name: app
+      port: 8080
+      public: true
