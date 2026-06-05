@@ -43,6 +43,12 @@ jobs:
             --connection isf_demo \
             --role ACCOUNTADMIN
 
+      - name: Build frontend
+        run: |
+          cd app/frontend
+          npm ci
+          npm run build
+
       - name: Build Docker image
         run: |
           docker build \
