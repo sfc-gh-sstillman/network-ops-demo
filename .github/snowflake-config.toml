@@ -1,0 +1,7 @@
+[connections.isf_demo]
+account = "sfsenorthamerica-sstillman_test"
+user = "SSTILLMAN"
+authenticator = "SNOWFLAKE_JWT"
+private_key_path = "OVERRIDDEN_BY_SECRET"
+role = "ACCOUNTADMIN"
+warehouse = "ISF_DEMO_WH"

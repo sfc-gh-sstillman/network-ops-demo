@@ -1,0 +1,27 @@
+spec:
+  containers:
+    - name: app
+      image: sfsenorthamerica-sstillman-test.registry.snowflakecomputing.com/isf_demos/apps/images/network-ops-app:v2
+      env:
+        SNOWFLAKE_ACCOUNT: sfsenorthamerica-sstillman_test
+        SNOWFLAKE_WAREHOUSE: ISF_DEMO_WH
+        SNOWFLAKE_DATABASE: NETWORK_OPERATIONS
+        SNOWFLAKE_SCHEMA: ANALYTICS
+        SNOWFLAKE_ROLE: ISF_DEMO_ADMIN
+        ENVIRONMENT: spcs
+        SPCS_ENV: "true"
+        PORT: "8080"
+      readinessProbe:
+        port: 8080
+        path: /health
+      resources:
+        requests:
+          memory: 1G
+          cpu: 0.5
+        limits:
+          memory: 2G
+          cpu: 1
+  endpoints:
+    - name: app
+      port: 8080
+      public: true

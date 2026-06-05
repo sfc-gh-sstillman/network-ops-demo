@@ -1,0 +1,93 @@
+name: Deploy Network Ops Demo to SPCS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+
+  workflow_dispatch:
+
+env:
+  REGISTRY: sfsenorthamerica-sstillman-test.registry.snowflakecomputing.com
+  IMAGE: sfsenorthamerica-sstillman-test.registry.snowflakecomputing.com/isf_demos/apps/images/network-ops-app
+  SERVICE: ISF_DEMOS.APPS.NETWORK_OPS_DEMO
+  COMPUTE_POOL: ISF_DEMO_POOL
+  SPEC_STAGE: "@ISF_DEMOS.APPS.SPECS"
+  SNOWFLAKE_CONNECTIONS_ISF_DEMO_PRIVATE_KEY_PATH: /tmp/snowflake_key.p8
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version tag
+        run: echo "VERSION=v${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Write Snowflake private key
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/snowflake_key.p8
+          chmod 600 /tmp/snowflake_key.p8
+
+      - name: Install Snowflake CLI
+        uses: Snowflake-Labs/snowflake-cli-action@v1
+        with:
+          default-config-file-path: .github/snowflake-config.toml
+        env:
+          SNOWFLAKE_CONNECTIONS_ISF_DEMO_PRIVATE_KEY_PATH: /tmp/snowflake_key.p8
+
+      - name: Login to Snowflake Registry
+        run: |
+          snow spcs image-registry login \
+            --connection isf_demo \
+            --role ACCOUNTADMIN
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -t ${{ env.IMAGE }}:${{ env.VERSION }} \
+            -t ${{ env.IMAGE }}:latest \
+            -f app/Dockerfile \
+            app/
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE }}:${{ env.VERSION }}
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Update service spec with new version
+        run: |
+          sed -i "s|image:.*network-ops-app:.*|image: ${{ env.IMAGE }}:${{ env.VERSION }}|" app/spcs/service-isf-demo.yaml
+
+      - name: Upload spec and redeploy service
+        run: |
+          snow stage copy app/spcs/service-isf-demo.yaml ${{ env.SPEC_STAGE }} \
+            --overwrite \
+            --connection isf_demo \
+            --role ACCOUNTADMIN
+
+          snow sql -q "ALTER SERVICE ${{ env.SERVICE }} FROM SPECIFICATION_FILE = 'service-isf-demo.yaml' IN STAGE ${{ env.SPEC_STAGE }}" \
+            --connection isf_demo \
+            --role ACCOUNTADMIN
+
+      - name: Wait for service to be ready
+        run: |
+          for i in $(seq 1 20); do
+            STATUS=$(snow sql -q "SELECT v.value:status::VARCHAR FROM (SELECT PARSE_JSON(SYSTEM\$GET_SERVICE_STATUS('${{ env.SERVICE }}'))) t, LATERAL FLATTEN(input => t.\$1) v" --connection isf_demo --role ACCOUNTADMIN --format json 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['V.VALUE:STATUS::VARCHAR'])" 2>/dev/null || echo "UNKNOWN")
+            echo "Attempt $i: Status = $STATUS"
+            if [ "$STATUS" = "READY" ]; then
+              echo "Service is ready!"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "Service did not reach READY state within 5 minutes"
+          exit 1
+
+      - name: Print public URL
+        run: |
+          snow sql -q "SHOW ENDPOINTS IN SERVICE ${{ env.SERVICE }}" \
+            --connection isf_demo \
+            --role ACCOUNTADMIN
