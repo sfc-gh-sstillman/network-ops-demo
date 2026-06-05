@@ -31,7 +31,7 @@ jobs:
           chmod 600 /tmp/snowflake_key.p8
 
       - name: Install Snowflake CLI
-        uses: Snowflake-Labs/snowflake-cli-action@v1
+        uses: Snowflake-Labs/snowflake-cli-action@v2
         with:
           default-config-file-path: .github/snowflake-config.toml
         env:
