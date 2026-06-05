@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import {
   LayoutDashboard, AlertTriangle, Activity, BarChart2,
-  Briefcase, TrendingUp, FileText, MessageSquare, ChevronDown, Bell
+  Briefcase, TrendingUp, FileText, MessageSquare, ChevronDown, Bell, Snowflake
 } from 'lucide-react'
 
 const PERSONAS = [
@@ -34,7 +34,7 @@ export default function Layout() {
         <div className="px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-7 h-7 bg-brand-blue rounded-lg flex items-center justify-center">
-              <Activity className="w-4 h-4 text-white" />
+              <Snowflake className="w-4 h-4 text-white" />
             </div>
             <span className="text-sm font-bold text-gray-900">Network Ops</span>
           </div>
