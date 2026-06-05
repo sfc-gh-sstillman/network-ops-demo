@@ -74,7 +74,7 @@ jobs:
             --connection isf_demo \
             --role ACCOUNTADMIN
 
-          snow sql -q "ALTER SERVICE ${{ env.SERVICE }} FROM SPECIFICATION_FILE = 'service-isf-demo.yaml' IN STAGE ${{ env.SPEC_STAGE }}" \
+          snow sql -q "ALTER SERVICE ${{ env.SERVICE }} FROM ${{ env.SPEC_STAGE }} SPECIFICATION_FILE = 'service-isf-demo.yaml'" \
             --connection isf_demo \
             --role ACCOUNTADMIN
 
