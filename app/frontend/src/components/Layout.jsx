@@ -5,14 +5,6 @@ import {
   Briefcase, TrendingUp, FileText, MessageSquare, ChevronDown, Bell
 } from 'lucide-react'
 
-function SnowflakeLogo({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 36 36" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M18 2l2.5 4.33h5L23 11l2.5 4.33-2.5 4.33L25.5 24h-5L18 28.33 15.5 24h-5L13 19.67 10.5 15.33 13 11l-2.5-4.67h5L18 2zm0 4.33L16.25 9.5h-3.5l1.75 3.03L12.75 15.5l1.75 3.03-1.75 2.97h3.5L18 24.67l1.75-3.17h3.5l-1.75-2.97L23.25 15.5l-1.75-3.03 1.75-2.97h-3.5L18 6.33z" />
-    </svg>
-  )
-}
-
 const PERSONAS = [
   { id: 'engineer',    label: 'Network Engineer',       color: 'bg-blue-600' },
   { id: 'analyst',     label: 'Performance Analyst',    color: 'bg-purple-600' },
@@ -41,10 +33,8 @@ export default function Layout() {
       <aside className="w-64 bg-white border-r border-gray-100 flex flex-col flex-shrink-0">
         <div className="px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6" viewBox="0 0 77 89" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M38.5 0L45.9 12.8H60.7L53.3 25.6L60.7 38.4L53.3 51.2L60.7 64H45.9L38.5 76.8L31.1 64H16.3L23.7 51.2L16.3 38.4L23.7 25.6L16.3 12.8H31.1L38.5 0Z" fill="#29B5E8"/>
-              </svg>
+            <div className="w-7 h-7 bg-brand-blue rounded-lg flex items-center justify-center">
+              <Activity className="w-4 h-4 text-white" />
             </div>
             <span className="text-sm font-bold text-gray-900">Network Ops</span>
           </div>
