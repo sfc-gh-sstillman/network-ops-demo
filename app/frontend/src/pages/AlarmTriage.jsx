@@ -113,20 +113,41 @@ function AgentPanel({ alarm, onAction }) {
           )}
 
           {showOverride && (
-            <input
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-blue"
-              placeholder="Reason for override..."
-              value={overrideReason}
-              onChange={e => setOverrideReason(e.target.value)}
-            />
+            <div className="space-y-2">
+              <input
+                autoFocus
+                className="w-full text-sm border border-amber-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-amber-400 bg-amber-50"
+                placeholder="Reason for override (required)..."
+                value={overrideReason}
+                onChange={e => setOverrideReason(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && overrideReason.trim() && onAction(alarm, 'OVERRIDE', overrideReason)}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => overrideReason.trim() && onAction(alarm, 'OVERRIDE', overrideReason)}
+                  disabled={!overrideReason.trim()}
+                  className="flex-1 bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  ✏ Confirm Override
+                </button>
+                <button
+                  onClick={() => { setShowOverride(false); setOverrideReason('') }}
+                  className="px-4 py-2 btn-secondary text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <button onClick={() => onAction(alarm, 'ACCEPT', '')} className="btn-primary text-sm py-2">✓ Accept</button>
-            <button onClick={() => { setShowOverride(true) }} className="btn-secondary text-sm py-2">✏ Override</button>
-            <button onClick={() => onAction(alarm, 'SUPPRESS', '')} className="btn-secondary text-sm py-2">🔇 Suppress</button>
-            <button onClick={() => onAction(alarm, 'ESCALATE', '')} className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">↑ Escalate</button>
-          </div>
+          {!showOverride && (
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button onClick={() => onAction(alarm, 'ACCEPT', '')} className="btn-primary text-sm py-2">✓ Accept</button>
+              <button onClick={() => setShowOverride(true)} className="btn-secondary text-sm py-2">✏ Override</button>
+              <button onClick={() => onAction(alarm, 'SUPPRESS', '')} className="btn-secondary text-sm py-2">🔇 Suppress</button>
+              <button onClick={() => onAction(alarm, 'ESCALATE', '')} className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">↑ Escalate</button>
+            </div>
+          )}
         </>
       )}
     </div>
